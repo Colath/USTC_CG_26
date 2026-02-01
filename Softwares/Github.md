@@ -37,18 +37,18 @@ Github Desktop是GitHub的客户端（桌面端）软件 ，它与GitHub进行�
 
 ### 1. 初始化
 
-- 使用 [the Import a Repository feature](https://github.com/new/import) 拷贝 `https://github.com/USTC-CG/USTC_CG_25` 得到自己的**私有库** 
+- 使用 [the Import a Repository feature](https://github.com/new/import) 拷贝 `https://github.com/USTC-CG/USTC_CG_26` 得到自己的**私有库** 
 
 - 将该私有库 `clone` 到本地
 
 - 在库的本地根目录执行
 
   ```bash
-  git remote add upstream https://github.com/USTC-CG/USTC_CG_25.git
+  git remote add upstream https://github.com/USTC-CG/USTC_CG_26.git
   git remote set-url --push upstream DISABLE
   ```
 
-### 2. 从 USTC_CG_25 拉取更新 
+### 2. 从 USTC_CG_26 拉取更新 
 
 **助教会在此仓库发布作业框架、文档的更新，**
 
