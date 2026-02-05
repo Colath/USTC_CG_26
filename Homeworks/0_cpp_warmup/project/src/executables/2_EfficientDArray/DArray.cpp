@@ -80,6 +80,21 @@ void DArray::SetSize(int nSize) {
 	m_nSize = nSize;
 }
 
+void DArray::Reserve(int nSize) {
+	if (nSize <= m_nMax)
+		return;
+
+	double* newData = new double[nSize];
+	for (int i = 0; i < m_nSize; i++) {
+		newData[i] = m_pData[i];
+	}
+
+	delete[] m_pData;
+	m_pData = newData;
+	m_nMax = nSize;
+}
+
+
 // get an element at an index
 const double& DArray::GetAt(int nIndex) const {
 	assert(nIndex >= 0 && nIndex < m_nSize);
