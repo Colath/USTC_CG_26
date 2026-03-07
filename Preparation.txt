@@ -1,0 +1,15 @@
+First I need to update my repository to be same with teacher's on branch main:
+git checkout main
+git fetch upstream
+git reset --hard upstream/main
+git submodule update --init --recursive
+
+Second I come to where I finish the homework——branch work
+git checkout work
+git merge main
+git submodule update --init --recursive
+
+Third when I finish the homework I have to submit
+git add .
+git commit -m "finish homework"
+git push origin work

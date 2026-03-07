@@ -27,7 +27,7 @@ void MiniDraw::draw_canvas()
     if (ImGui::Begin(
             "Canvas",
             &flag_show_canvas_view_,
-            ImGuiWindowFlags_NoDecoration|ImGuiWindowFlags_NoBackground))
+            ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground))
     {
         // Buttons for shape types
         if (ImGui::Button("Line"))
@@ -41,14 +41,42 @@ void MiniDraw::draw_canvas()
             std::cout << "Set shape to Rect" << std::endl;
             p_canvas_->set_rect();
         }
+        ImGui::SameLine();
+        if (ImGui::Button("Ellipse"))
+        {
+            std::cout << "Set shape to Ellipse" << std::endl;
+            p_canvas_->set_ellipse();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Polygon"))
+        {
+            std::cout << "Set shape to Polygon" << std::endl;
+            p_canvas_->set_polygon();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Freehand"))
+        {
+            std::cout << "Set shape to Freehand" << std::endl;
+            p_canvas_->set_freehand();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Undo"))
+        {
+            p_canvas_->undo();
+        }
 
-        // HW1_TODO: More primitives
-        //    - Ellipse
-        //    - Polygon
-        //    - Freehand(optional)
-        
+        ImGui::SameLine();
+        if (ImGui::Button("Clear"))
+        {
+            p_canvas_->clear_shape_list();
+        }
+
         // Canvas component
-        ImGui::Text("Press left mouse to add shapes.");
+        ImGui::Text(
+            "Line/Rect/Ellipse: Click-Click. Polygon: Left click add points, "
+            "Enter finish, Esc cancel. Freehand: Click once to start, move to "
+            "draw, click again to finish.");
+
         // Set the canvas to fill the rest of the window
         const auto& canvas_min = ImGui::GetCursorScreenPos();
         const auto& canvas_size = ImGui::GetContentRegionAvail();
