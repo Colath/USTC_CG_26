@@ -37,3 +37,9 @@ target_include_directories(imgui
 )
 target_link_libraries(imgui PUBLIC glfw)
 set_target_properties(imgui PROPERTIES FOLDER "third_party")
+
+# dlib
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/dlib-20.0/dlib/CMakeLists.txt")
+  add_subdirectory(dlib-20.0/dlib)
+  set_target_properties(dlib PROPERTIES FOLDER "third_party")
+endif()

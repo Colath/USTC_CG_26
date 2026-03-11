@@ -2,6 +2,11 @@
 
 #include <cmath>
 #include <iostream>
+#include "warper/IDW_warper.h"
+#include "warper/RBF_warper.h"
+#include "warper/dlib_warper.h"
+#include <annoylib.h>
+#include <kissrandom.h>
 
 namespace USTC_CG
 {
@@ -124,6 +129,61 @@ void WarpingWidget::warping()
         }
     }
 
+    auto gap_fill = [&](Warper& warper) {
+        std::vector<bool> mapped(data_->width() * data_->height(), false);
+        Annoy::AnnoyIndex<int, float, Annoy::Euclidean, Annoy::Kiss32Random, Annoy::AnnoyIndexSingleThreadedBuildPolicy> index(2);
+        std::vector<int> mapped_x, mapped_y;
+        int item_idx = 0;
+
+        for (int y = 0; y < data_->height(); ++y)
+        {
+            for (int x = 0; x < data_->width(); ++x)
+            {
+                double new_x, new_y;
+                warper.warp(x, y, new_x, new_y);
+
+                int nx = static_cast<int>(new_x + 0.5);
+                int ny = static_cast<int>(new_y + 0.5);
+
+                if (nx >= 0 && nx < data_->width() && ny >= 0 && ny < data_->height())
+                {
+                    std::vector<unsigned char> pixel = data_->get_pixel(x, y);
+                    warped_image.set_pixel(nx, ny, pixel);
+                    int img_idx = ny * data_->width() + nx;
+                    if (!mapped[img_idx]) {
+                        mapped[img_idx] = true;
+                        mapped_x.push_back(nx);
+                        mapped_y.push_back(ny);
+                        float vec[2] = { static_cast<float>(nx), static_cast<float>(ny) };
+                        index.add_item(item_idx++, vec);
+                    }
+                }
+            }
+        }
+
+        if (item_idx > 0) {
+            index.build(1);
+            Image final_image(warped_image);
+            for (int y = 0; y < data_->height(); ++y) {
+                for (int x = 0; x < data_->width(); ++x) {
+                    if (!mapped[y * data_->width() + x]) {
+                        float query_vec[2] = { static_cast<float>(x), static_cast<float>(y) };
+                        std::vector<int> closest_items;
+                        std::vector<float> distances;
+                        index.get_nns_by_vector(query_vec, 1, -1, &closest_items, &distances);
+                        // Using threshold to only fill internal gaps and avoid massive bleeding
+                        if (!closest_items.empty() && distances[0] < 3.0f) {
+                            int p_id = closest_items[0];
+                            std::vector<unsigned char> color = warped_image.get_pixel(mapped_x[p_id], mapped_y[p_id]);
+                            final_image.set_pixel(x, y, color);
+                        }
+                    }
+                }
+            }
+            warped_image = std::move(final_image);
+        }
+    };
+
     switch (warping_type_)
     {
         case kDefault: break;
@@ -158,14 +218,46 @@ void WarpingWidget::warping()
         {
             // HW2_TODO: Implement the IDW warping
             // use selected points start_points_, end_points_ to construct the map
-            std::cout << "IDW not implemented." << std::endl;
+            IDWWarper idw_warper;
+            
+            std::vector<std::pair<double, double>> start_pts, end_pts;
+            for (size_t i = 0; i < start_points_.size(); ++i) {
+                start_pts.push_back({start_points_[i].x, start_points_[i].y});
+                end_pts.push_back({end_points_[i].x, end_points_[i].y});
+            }
+            idw_warper.set_control_points(start_pts, end_pts);
+
+            gap_fill(idw_warper);
             break;
         }
         case kRBF:
         {
             // HW2_TODO: Implement the RBF warping
             // use selected points start_points_, end_points_ to construct the map
-            std::cout << "RBF not implemented." << std::endl;
+            RBFWarper rbf_warper;
+
+            std::vector<std::pair<double, double>> start_pts, end_pts;
+            for (size_t i = 0; i < start_points_.size(); ++i) {
+                start_pts.push_back({start_points_[i].x, start_points_[i].y});
+                end_pts.push_back({end_points_[i].x, end_points_[i].y});
+            }
+            rbf_warper.set_control_points(start_pts, end_pts);
+
+            gap_fill(rbf_warper);
+            break;
+        }
+        case kDlib:
+        {
+            DlibWarper dlib_warper;
+
+            std::vector<std::pair<double, double>> start_pts, end_pts;
+            for (size_t i = 0; i < start_points_.size(); ++i) {
+                start_pts.push_back({start_points_[i].x, start_points_[i].y});
+                end_pts.push_back({end_points_[i].x, end_points_[i].y});
+            }
+            dlib_warper.set_control_points(start_pts, end_pts);
+
+            gap_fill(dlib_warper);
             break;
         }
         default: break;
@@ -194,6 +286,10 @@ void WarpingWidget::set_IDW()
 void WarpingWidget::set_RBF()
 {
     warping_type_ = kRBF;
+}
+void WarpingWidget::set_dlib()
+{
+    warping_type_ = kDlib;
 }
 void WarpingWidget::enable_selecting(bool flag)
 {

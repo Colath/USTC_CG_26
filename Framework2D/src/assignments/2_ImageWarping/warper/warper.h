@@ -10,6 +10,9 @@
 // warp(...) function to perform the actual warping.
 #pragma once
 
+#include <vector>
+#include <utility>
+
 namespace USTC_CG
 {
 class Warper
@@ -18,7 +21,11 @@ class Warper
     virtual ~Warper() = default;
 
     // HW2_TODO: A virtual function warp(...)
-    
+    virtual void warp(double x, double y, double& new_x, double& new_y) = 0;
+
     // HW2_TODO: other functions or variables if you need
+    virtual void set_control_points(
+        const std::vector<std::pair<double, double>>& start_points,
+        const std::vector<std::pair<double, double>>& end_points) = 0;
 };
-}  // namespace USTC_CG
+}  // namespace USTC_CG}  // namespace USTC_CG
