@@ -8,14 +8,6 @@ file(GLOB source
 add_executable(${PROJECT_NAME} ${source})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-# HW2_TODO(optional): Add Dlib support to the project
-if(TARGET dlib::dlib)
-  message(STATUS "Dlib found and linked")
-  target_link_libraries(${PROJECT_NAME} PRIVATE dlib::dlib)
-else()
-  message(STATUS "Dlib not found")
-endif()
-
 set_target_properties(${PROJECT_NAME} PROPERTIES 
   DEBUG_POSTFIX "_d"
   RUNTIME_OUTPUT_DIRECTORY "${BINARY_DIR}"
