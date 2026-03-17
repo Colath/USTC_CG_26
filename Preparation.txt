@@ -1,15 +1,36 @@
-First I need to update my repository to be same with teacher's on branch main:
-git checkout main
-git fetch upstream
-git reset --hard upstream/main
+助教更新后
+cd D:\USTC_CG_26
+git switch main
+git pull upstream main
+git push origin main
 git submodule update --init --recursive
 
-Second I come to where I finish the homework——branch work
-git checkout work
+cd Framework3D/Ruzino
+git fetch upstream
+git switch main
+git reset --hard upstream/main
+git push -f origin main
+git submodule update --init --recursive
+
+cd D:\USTC_CG_26
+git switch work
 git merge main
 git submodule update --init --recursive
 
-Third when I finish the homework I have to submit
-git add .
-git commit -m "finish homework"
+cd Framework3D/Ruzino
+git switch my_work
+git merge main
+git submodule update --init --recursive
+
+做完作业后
+cd D:\USTC_CG_26\Framework3D\Ruzino
+git switch my_work
+git add 改过的文件
+git commit -m "homework update"
+git push origin my_work
+
+cd D:\USTC_CG_26
+git switch work
+git add Framework3D/Ruzino
+git commit -m "update Ruzino submodule"
 git push origin work
