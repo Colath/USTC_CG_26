@@ -76,7 +76,12 @@ std::shared_ptr<Image> SourceImageWidget::get_data()
 
 ImVec2 SourceImageWidget::get_position() const
 {
-    return start_;
+    return ImVec2(std::min(start_.x, end_.x), std::min(start_.y, end_.y));
+}
+
+std::size_t SourceImageWidget::get_mask_version() const
+{
+    return mask_version_;
 }
 
 void SourceImageWidget::mouse_click_event()

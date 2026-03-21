@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 #include "common/image_widget.h"
 #include "shapes/rect.h"
 
@@ -35,6 +37,7 @@ class SourceImageWidget : public ImageWidget
     // Get the position to locate the region in the target image.
     // We return the start point of the selected region as default.
     ImVec2 get_position() const;
+    std::size_t get_mask_version() const;
 
    private:
     // Event handlers for mouse interactions.
@@ -58,6 +61,7 @@ class SourceImageWidget : public ImageWidget
     // The **value** of the mask should be 0 or 255: 0 for the background and
     // 255 for the selected region.
     std::shared_ptr<Image> selected_region_mask_;
+    std::size_t mask_version_ = 0;
 
     ImVec2 start_, end_;
     bool flag_enable_selecting_region_ = false;

@@ -1,7 +1,11 @@
 #pragma once
 
-#include "source_image_widget.h"
+#include <cstddef>
+
 #include "common/image_widget.h"
+#include "mixed_clone.h"
+#include "seamless_clone.h"
+#include "source_image_widget.h"
 
 namespace USTC_CG
 {
@@ -14,7 +18,8 @@ class TargetImageWidget : public ImageWidget
     {
         kDefault = 0,
         kPaste = 1,
-        kSeamless = 2
+        kSeamless = 2,
+        kMixed = 3
     };
 
     explicit TargetImageWidget(
@@ -33,11 +38,15 @@ class TargetImageWidget : public ImageWidget
     // type, you can implement seamless cloning, mix-gradient cloning, etc.
     void set_paste();
     void set_seamless();
+    void set_mixed();
 
     // The clone function
     void clone();
 
    private:
+    bool prepare_mixed_clone();
+    bool prepare_seamless_clone();
+
     // Event handlers for mouse interactions.
     void mouse_click_event();
     void mouse_move_event();
@@ -50,7 +59,13 @@ class TargetImageWidget : public ImageWidget
     std::shared_ptr<Image> back_up_;
     // Source image
     std::shared_ptr<SourceImageWidget> source_image_;
+    std::unique_ptr<MixedClone> mixed_clone_;
+    std::unique_ptr<SeamlessClone> seamless_clone_;
     CloneType clone_type_ = kDefault;
+    std::size_t mixed_mask_version_ = 0;
+    std::size_t seamless_mask_version_ = 0;
+    ImVec2 mixed_source_position_ = ImVec2(0.0f, 0.0f);
+    ImVec2 seamless_source_position_ = ImVec2(0.0f, 0.0f);
 
     ImVec2 mouse_position_;
     bool edit_status_ = false;

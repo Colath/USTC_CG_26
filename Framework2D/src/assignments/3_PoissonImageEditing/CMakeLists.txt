@@ -5,6 +5,14 @@ file(GLOB source
   "${CMAKE_CURRENT_SOURCE_DIR}/shapes/*.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/shapes/*.h" 
 )
+list(APPEND source
+  "${CMAKE_CURRENT_SOURCE_DIR}/mixed_clone.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mixed_clone.h"
+  "${CMAKE_CURRENT_SOURCE_DIR}/poisson_clone.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/poisson_clone.h"
+  "${CMAKE_CURRENT_SOURCE_DIR}/seamless_clone.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/seamless_clone.h"
+)
 add_executable(${PROJECT_NAME} ${source})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 set_target_properties(${PROJECT_NAME} PROPERTIES 
