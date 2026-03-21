@@ -6,3 +6,7 @@ imgui.ini
 .DS_Store
 .vs
 *.zip
+# Ignore build directories and Windows artifacts
+build*/
+*.obj
+nul
