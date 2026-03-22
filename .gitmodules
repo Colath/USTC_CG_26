@@ -9,4 +9,4 @@
 	url = https://github.com/glfw/glfw.git
 [submodule "Framework3D/Ruzino"]
 	path = Framework3D/Ruzino
-	url = https://github.com/SyouSanGin/Ruzino-Homework
+	url = https://github.com/Colath/Ruzino-Homework
