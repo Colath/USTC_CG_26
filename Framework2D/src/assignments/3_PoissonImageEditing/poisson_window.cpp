@@ -35,6 +35,7 @@ void PoissonWindow::draw_toolbar()
 {
     if (ImGui::BeginMainMenuBar())
     {
+        // --- 文件菜单 ---
         if (ImGui::BeginMenu("File"))
         {
             if (ImGui::MenuItem("Open Target.."))
@@ -58,6 +59,7 @@ void PoissonWindow::draw_toolbar()
 
         ImGui::Separator();
 
+        // --- 编辑基础功能 ---
         if (ImGui::MenuItem("Restore") && p_target_)
         {
             p_target_->restore();
@@ -66,49 +68,64 @@ void PoissonWindow::draw_toolbar()
 
         ImGui::Separator();
 
+        // --- 选取设置 ---
         static bool selectable = false;
         ImGui::Checkbox("Select", &selectable);
-        add_tooltips(
-            "On: Enable region selection in the source image. Drag left mouse "
-            "to select rectangle (default) in the source.");
+        add_tooltips("On: Enable region selection in the source image.");
         if (p_source_)
             p_source_->enable_selecting(selectable);
+
         static bool realtime = false;
         ImGui::Checkbox("Realtime", &realtime);
-        add_tooltips(
-            "On: Enable realtime cloning in the target image, which means that "
-            "you can drag the mouse and the cloning would update along the "
-            "mouse.");
+        add_tooltips("On: Enable realtime cloning (updates while dragging).");
         if (p_target_)
             p_target_->set_realtime(realtime);
 
         ImGui::Separator();
 
+        // --- 选取工具切换 (Bonus 功能) ---
+        if (ImGui::MenuItem("Rect Tool") && p_source_)
+        {
+            p_source_->set_region_type(SourceImageWidget::kRect);
+        }
+        add_tooltips("Use rectangle to select region (Drag to draw).");
+
+        if (ImGui::MenuItem("Polygon Tool") && p_source_)
+        {
+            p_source_->set_region_type(SourceImageWidget::kPolygon);
+        }
+        add_tooltips(
+            "Use polygon to select region (Left-click to add points, "
+            "Right-click to close).");
+
+        ImGui::Separator();
+
+        // --- 克隆算法切换 ---
         if (ImGui::MenuItem("Paste") && p_target_ && p_source_)
         {
             p_target_->set_paste();
         }
-        add_tooltips(
-            "Press this button and then click in the target image, to "
-            "clone the selected region to the target image.");
+        add_tooltips("Clone the selected region using simple paste.");
+
         if (ImGui::MenuItem("Seamless") && p_target_ && p_source_)
         {
             p_target_->set_seamless();
         }
-        add_tooltips(
-            "Press this button and then click in the target image, to "
-            "perform Poisson seamless cloning on the selected region.");
-        if (ImGui::MenuItem("Mixed Gradient") && p_target_ && p_source_)
+        add_tooltips("Perform Poisson seamless cloning (Importing gradients).");
+
+        if (ImGui::MenuItem("Mixed") && p_target_ && p_source_)
         {
             p_target_->set_mixed();
         }
-        add_tooltips(
-            "Press this button and then click in the target image, to "
-            "perform Poisson mixed-gradient cloning on the selected region.");
+        add_tooltips("Perform Poisson mixed-gradient cloning.");
 
         ImGui::EndMainMenuBar();
     }
 }
+
+// --------------------------------------------------------------------------
+// 以下部分保持不变，确保窗口布局正确
+// --------------------------------------------------------------------------
 
 void PoissonWindow::draw_target()
 {
@@ -116,7 +133,6 @@ void PoissonWindow::draw_target()
     ImGui::SetNextWindowSize(ImVec2(image_size.x + 60, image_size.y + 60));
     if (ImGui::Begin("Target Image", &flag_show_target_view_))
     {
-        // Place the image in the center of the window
         const auto& min = ImGui::GetCursorScreenPos();
         const auto& size = ImGui::GetContentRegionAvail();
         ImVec2 pos = ImVec2(
@@ -134,7 +150,6 @@ void PoissonWindow::draw_source()
     ImGui::SetNextWindowSize(ImVec2(image_size.x + 60, image_size.y + 60));
     if (ImGui::Begin("Source Image", &flag_show_source_view_))
     {
-        // Place the image in the center of the window
         const auto& min = ImGui::GetCursorScreenPos();
         const auto& size = ImGui::GetContentRegionAvail();
         ImVec2 pos = ImVec2(
@@ -162,8 +177,8 @@ void PoissonWindow::draw_open_target_image_file_dialog()
         {
             std::string filePathName =
                 ImGuiFileDialog::Instance()->GetFilePathName();
-            std::string label = filePathName;
-            p_target_ = std::make_shared<TargetImageWidget>(label, filePathName);
+            p_target_ =
+                std::make_shared<TargetImageWidget>(filePathName, filePathName);
             if (p_source_)
                 p_target_->set_source(p_source_);
         }
@@ -188,9 +203,8 @@ void PoissonWindow::draw_open_source_image_file_dialog()
         {
             std::string filePathName =
                 ImGuiFileDialog::Instance()->GetFilePathName();
-            std::string label = filePathName;
-            p_source_ = std::make_shared<SourceImageWidget>(label, filePathName);
-            // Bind the source image to the target
+            p_source_ =
+                std::make_shared<SourceImageWidget>(filePathName, filePathName);
             if (p_source_)
                 p_target_->set_source(p_source_);
         }
@@ -215,7 +229,6 @@ void PoissonWindow::draw_save_image_file_dialog()
         {
             std::string filePathName =
                 ImGuiFileDialog::Instance()->GetFilePathName();
-            std::string label = filePathName;
             if (p_target_)
                 p_target_->save_to_disk(filePathName);
         }
@@ -223,6 +236,7 @@ void PoissonWindow::draw_save_image_file_dialog()
         flag_save_file_dialog_ = false;
     }
 }
+
 void PoissonWindow::add_tooltips(std::string desc)
 {
     if (ImGui::BeginItemTooltip())
@@ -233,4 +247,5 @@ void PoissonWindow::add_tooltips(std::string desc)
         ImGui::EndTooltip();
     }
 }
+
 }  // namespace USTC_CG
