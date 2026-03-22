@@ -35,7 +35,6 @@ void PoissonWindow::draw_toolbar()
 {
     if (ImGui::BeginMainMenuBar())
     {
-        // --- 文件菜单 ---
         if (ImGui::BeginMenu("File"))
         {
             if (ImGui::MenuItem("Open Target.."))
@@ -59,7 +58,6 @@ void PoissonWindow::draw_toolbar()
 
         ImGui::Separator();
 
-        // --- 编辑基础功能 ---
         if (ImGui::MenuItem("Restore") && p_target_)
         {
             p_target_->restore();
@@ -68,7 +66,6 @@ void PoissonWindow::draw_toolbar()
 
         ImGui::Separator();
 
-        // --- 选取设置 ---
         static bool selectable = false;
         ImGui::Checkbox("Select", &selectable);
         add_tooltips("On: Enable region selection in the source image.");
@@ -83,14 +80,13 @@ void PoissonWindow::draw_toolbar()
 
         ImGui::Separator();
 
-        // --- 选取工具切换 (Bonus 功能) ---
-        if (ImGui::MenuItem("Rect Tool") && p_source_)
+        if (ImGui::MenuItem("Rect") && p_source_)
         {
             p_source_->set_region_type(SourceImageWidget::kRect);
         }
         add_tooltips("Use rectangle to select region (Drag to draw).");
 
-        if (ImGui::MenuItem("Polygon Tool") && p_source_)
+        if (ImGui::MenuItem("Polygon") && p_source_)
         {
             p_source_->set_region_type(SourceImageWidget::kPolygon);
         }
@@ -122,10 +118,6 @@ void PoissonWindow::draw_toolbar()
         ImGui::EndMainMenuBar();
     }
 }
-
-// --------------------------------------------------------------------------
-// 以下部分保持不变，确保窗口布局正确
-// --------------------------------------------------------------------------
 
 void PoissonWindow::draw_target()
 {

@@ -1,12 +1,61 @@
+# =========================
+# 1. CMake & 构建输出目录
+# =========================
+out/
 build/
+build*/
 bin/
 libs/
-.vscode
-imgui.ini
-.DS_Store
-.vs
-*.zip
-# Ignore build directories and Windows artifacts
-build*/
+
+# CMake 临时文件与本地用户配置 (不要提交用户特定的预设)
+CMakeUserPresets.json
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+compile_commands.json
+
+# =========================
+# 2. Visual Studio & VS Code 目录
+# =========================
+.vs/
+.vscode/
+
+# VS 临时数据库、用户设置和缓存 (非常容易引起冲突的源头)
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.db
+*.opendb
+*.sqlite
+*.VC.db
+
+# =========================
+# 3. C/C++ 编译产物 & Windows 临时文件
+# =========================
 *.obj
+*.exe
+*.dll
+*.lib
+*.pdb
+*.exp
+*.ilk
+*.idb
+*.pch
+*.tlog
+*.idb
 nul
+
+# =========================
+# 4. 项目特定 & 杂项
+# =========================
+# Dear ImGui 布局保存文件
+imgui.ini
+
+# 压缩包
+*.zip
+
+# OS 缓存文件
+.DS_Store
+Thumbs.db

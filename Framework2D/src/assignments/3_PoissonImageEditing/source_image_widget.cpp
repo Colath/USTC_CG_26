@@ -41,18 +41,13 @@ void SourceImageWidget::select_region()
 
     bool is_hovered_ = ImGui::IsItemHovered();
 
-    // 左键点击（矩形起点，或多边形加点）
     if (is_hovered_ && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-        mouse_click_event();
-
-    // 鼠标移动
+    
     mouse_move_event();
 
-    // 矩形的松开逻辑：左键松开即完成
     if (region_type_ == kRect && !ImGui::IsMouseDown(ImGuiMouseButton_Left))
         mouse_release_event();
 
-    // 多边形的完成逻辑：右键闭合并完成
     if (region_type_ == kPolygon && is_hovered_ &&
         ImGui::IsMouseClicked(ImGuiMouseButton_Right))
     {
@@ -92,8 +87,6 @@ std::size_t SourceImageWidget::get_mask_version() const
 
 ImVec2 SourceImageWidget::get_position() const
 {
-    // 对多边形来说，最好返回包围盒左上角，这里用一种简单的通用近似（如果选了多边形，最好在选完后更新
-    // start 和 end）
     return ImVec2(std::min(start_.x, end_.x), std::min(start_.y, end_.y));
 }
 
@@ -115,13 +108,11 @@ void SourceImageWidget::mouse_click_event()
         {
             draw_status_ = true;
             selected_shape_ = std::make_shared<Polygon>();
-            // 记录初始点作为近似偏移锚点
             start_ = end_ = mouse_pos_in_canvas();
         }
         ImVec2 pos = mouse_pos_in_canvas();
         selected_shape_->add_control_point(pos.x, pos.y);
 
-        // 更新包围盒范围，确保 get_position() 相对正确
         start_.x = std::min(start_.x, pos.x);
         start_.y = std::min(start_.y, pos.y);
         end_.x = std::max(end_.x, pos.x);
@@ -184,6 +175,6 @@ void SourceImageWidget::update_selected_region()
         selected_region_mask_->set_pixel(x, y, { 255 });
     }
 
-    mask_version_++;  // 通知 Target 重新计算系数矩阵
+    mask_version_++;  
 }
 }  // namespace USTC_CG

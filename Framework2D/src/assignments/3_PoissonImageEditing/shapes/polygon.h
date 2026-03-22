@@ -17,10 +17,8 @@ class Polygon : public Shape
     void update(float x, float y) override;
     void add_control_point(float x, float y) override;
 
-    // 获取多边形内部的所有像素（扫描线算法核心实现）
     std::vector<std::pair<int, int>> get_interior_pixels() const;
 
-    // 结束绘制
     void finish_drawing();
 
    private:
