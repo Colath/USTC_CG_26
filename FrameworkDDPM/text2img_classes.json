@@ -1,0 +1,10 @@
+{
+  "classes": [
+    "cat",
+    "dog"
+  ],
+  "class_to_idx": {
+    "cat": 0,
+    "dog": 1
+  }
+}

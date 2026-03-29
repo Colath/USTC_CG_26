@@ -4,26 +4,63 @@ import numpy as np
 import torch
 import torchvision
 import matplotlib.pyplot as plt
+import os
 
 
-def load_transformed_dataset(img_size=256, batch_size=128) -> DataLoader:
-    # Load dataset and perform data transformations
-    data_transforms = [
-        transforms.Resize((img_size, img_size)),
-        transforms.ToTensor(),  # Scales data into [0,1]
-        transforms.Lambda(lambda t: (t * 2) - 1),  # Scale between [-1, 1]
-    ]
-    data_transform = transforms.Compose(data_transforms)
+def build_transforms(img_size=256, augment=False):
+    data_transforms = [transforms.Resize((img_size, img_size))]
+    if augment:
+        data_transforms.extend(
+            [
+                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1),
+            ]
+        )
+    data_transforms.extend(
+        [
+            transforms.ToTensor(),  # Scales data into [0,1]
+            transforms.Lambda(lambda t: (t * 2) - 1),  # Scale between [-1, 1]
+        ]
+    )
+    return transforms.Compose(data_transforms)
 
-    # TODO: 你可以更改这两个地方的路径，以实现对其他数据集的加载
-    # 当然，你也可以添加更多的参数，以支持不同数据集之间的修改
-    train = torchvision.datasets.ImageFolder(root="./datasets-1/train", transform=data_transform)
 
-    test = torchvision.datasets.ImageFolder(root="./datasets-1/test", transform=data_transform)
+def load_dataset_with_metadata(img_size=256, dataset_root="./datasets-1", use_test_split=True, augment=False):
+    data_transform = build_transforms(img_size=img_size, augment=augment)
+    train = torchvision.datasets.ImageFolder(root=os.path.join(dataset_root, "train"), transform=data_transform)
+    datasets = [train]
 
-    dataset = torch.utils.data.ConcatDataset([train, test])
+    test_root = os.path.join(dataset_root, "test")
+    if use_test_split and os.path.exists(test_root):
+        datasets.append(torchvision.datasets.ImageFolder(root=test_root, transform=data_transform))
 
-    return DataLoader(dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    dataset = datasets[0] if len(datasets) == 1 else torch.utils.data.ConcatDataset(datasets)
+    classes = list(train.classes)
+    class_to_idx = dict(train.class_to_idx)
+    return dataset, classes, class_to_idx
+
+
+def load_transformed_dataset(
+    img_size=256,
+    batch_size=128,
+    dataset_root="./datasets-1",
+    use_test_split=True,
+    augment=False,
+    repeat=1,
+) -> DataLoader:
+    dataset, _, _ = load_dataset_with_metadata(
+        img_size=img_size,
+        dataset_root=dataset_root,
+        use_test_split=use_test_split,
+        augment=augment,
+    )
+
+    if repeat > 1:
+        dataset = torch.utils.data.ConcatDataset([dataset] * repeat)
+
+    # Small datasets should not drop the only batch.
+    drop_last = len(dataset) >= batch_size
+    return DataLoader(dataset, batch_size=batch_size, shuffle=True, drop_last=drop_last)
 
 
 def show_tensor_image(image):
