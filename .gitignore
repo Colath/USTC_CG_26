@@ -59,3 +59,24 @@ imgui.ini
 # OS 缓存文件
 .DS_Store
 Thumbs.db
+
+# =========================
+# 5. Python & 模型相关
+# =========================
+# 字节码与代码检查缓存
+__pycache__/
+*.py[cod]
+*$py.class
+.ruff_cache/
+
+# 虚拟环境目录
+.venv/
+
+# 深度学习模型权重 (避免提交几百 MB 的大文件)
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+
+# 数据集目录 (可选，如果不想提交本地测试数据集可以取消下面这行的注释)
+# datasets-*/
